@@ -331,8 +331,9 @@ class CortexM_LPC5500(CortexM_v8M):
 
             if not halt_only:
                 self.reset(reset_type)
-            else:
-                self.halt()
+                self.session.target.unlock(self.session.target.aps[DM_AP])
+
+            self.halt()
 
         # wait until the unit resets
         with timeout.Timeout(2.0) as t_o:

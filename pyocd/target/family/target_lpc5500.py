@@ -234,6 +234,16 @@ class LPC5500Family(CoreSightTarget):
             return
         return
 
+
+    def reset(self, reset_type):
+        # unlock debug access after reset
+        super(LPC5500Family, self).reset(reset_type)
+
+        if (0 in self.aps) and self.aps[0].is_enabled:
+            return
+
+        self.unlock(self.aps[DM_AP])
+
 class CortexM_LPC5500(CortexM_v8M):
 
     def reset_and_halt(self, reset_type=None):

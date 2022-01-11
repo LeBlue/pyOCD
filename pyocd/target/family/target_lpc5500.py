@@ -131,6 +131,9 @@ class LPC5500Family(CoreSightTarget):
         # Perform the unlock procedure using the debugger mailbox.
         self.unlock(self.aps[DM_AP])
 
+        if seq is None:
+            return
+
         # re-run discovery
         LOG.info("re-running discovery")
         new_seq = CallSequence()
@@ -234,6 +237,13 @@ class LPC5500Family(CoreSightTarget):
             return
         return
 
+
+    def reset(self, reset_type):
+        # unlock debug access after reset
+        super(LPC5500Family, self).reset(reset_type)
+
+        self.check_locked_state(None)
+
 class CortexM_LPC5500(CortexM_v8M):
 
     def reset_and_halt(self, reset_type=None):
@@ -321,8 +331,8 @@ class CortexM_LPC5500(CortexM_v8M):
 
             if not halt_only:
                 self.reset(reset_type)
-            else:
-                self.halt()
+
+            self.halt()
 
         # wait until the unit resets
         with timeout.Timeout(2.0) as t_o:
@@ -348,3 +358,10 @@ class CortexM_LPC5500(CortexM_v8M):
 
         # restore vector catch setting
         self.write_memory(CortexM.DEMCR, demcr)
+
+
+    def reset(self, reset_type):
+        # unlock debug access after reset
+        super(CortexM_LPC5500, self).reset(reset_type)
+
+        self.session.target.check_locked_state(None)
